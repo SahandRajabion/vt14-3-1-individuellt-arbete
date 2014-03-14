@@ -6,13 +6,14 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Individuella.Model;
 using System.Web.ModelBinding;
+using System.Collections;
 
 namespace Individuella.Pages.ThreadPages
 {
     public partial class Details : System.Web.UI.Page
     {
 
- private Service _service;
+        private Service _service;
 
         private Service Service
         {
@@ -24,7 +25,7 @@ namespace Individuella.Pages.ThreadPages
         {
 
 
-           
+
             Literal.Text = Page.GetTempData("Msg") as string;
             Literal.Visible = !String.IsNullOrWhiteSpace(Literal.Text);
 
@@ -46,13 +47,13 @@ namespace Individuella.Pages.ThreadPages
             }
         }
 
-        
+
         public void ThreadListView_DeleteItem([RouteData] int ID)
         {
             try
             {
                 Service.DeleteThread(ID);
-               
+
                 // Lägger till meddelande i Page extension-metoden
                 Page.SetTempData("Msg", "Tråden är borttagen.");
                 Response.RedirectToRoute("Default");
@@ -64,12 +65,13 @@ namespace Individuella.Pages.ThreadPages
             }
         }
 
-        
+
         public void ThreadListView_UpdateItem([RouteData] int ID)
         {
             try
             {
                 var thread = Service.GetThreadByID(ID);
+
                 if (thread == null)
                 {
                     ModelState.AddModelError(String.Empty,
@@ -80,6 +82,7 @@ namespace Individuella.Pages.ThreadPages
                 if (TryUpdateModel(thread))
                 {
                     Service.SaveThread(thread);
+
                     // Lägger till ett meddelande i Page extension-metoden
                     Page.SetTempData("Msg", "Tråden har uppdaterats.");
                     Response.RedirectToRoute("ThreadDetails", new { id = thread.ThreadID });
@@ -90,6 +93,45 @@ namespace Individuella.Pages.ThreadPages
             {
                 ModelState.AddModelError(String.Empty, "Ett fel har inträffat när tråden skulle uppdateras.");
             }
+        }
+
+
+
+        public IEnumerable<Tagg> CheckBoxListReadOnly_GetData()
+        {
+
+            Service service = new Service();
+            return service.GetTags();
+        }
+
+        protected void CheckBoxListReadOnly_DataBinding(object sender, EventArgs e)
+        {
+
+            //FUNGERAR EJ 
+
+            //ArrayList TagCheckId = new ArrayList();
+          
+            //CheckBoxList checkboxlist = (CheckBoxList)ThreadListView.FindControl("CheckBoxListReadOnly");
+            //foreach (ListItem fields in checkboxlist.Items)
+            //{
+            //    if (fields.Selected)
+            //    {
+
+            //        TagCheckId.Add((string)fields.Value);
+                   
+            //    }
+            //}
+
+
+            
+
+
+
+
+
+
+
+
         }
     }
 }

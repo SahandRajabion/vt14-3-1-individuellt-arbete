@@ -10,9 +10,6 @@ namespace Individuella.Model.DAL
     public class ThreadDAL:DALBase
     {
 
-
-
-
         //Får en referens av ett list objekt i return med alla kontakter i databasen
         public static IEnumerable<Thread> GetThreads()
         {

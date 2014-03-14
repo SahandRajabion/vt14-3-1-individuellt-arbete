@@ -24,6 +24,14 @@
 
             <span id="datum"><%#: Item.Datum %></span>
 
+           
+
+            <div>
+                  <%-- <asp:CheckBoxList ID="CheckBoxListReadOnly" SelectMethod="CheckBoxListReadOnly1_GetData" TextAlign="Left" runat="server" OnDataBinding="CheckBoxListReadOnly_DataBinding" DataValueField="TagID" DataTextField="Tag" Enabled="false"></asp:CheckBoxList>--%>
+               
+            </div>
+
+
             <asp:LinkButton ID="LinkButton1" runat="server" CommandName="Delete" Text="Ta bort" OnClientClick='<%# String.Format("return confirm (\"Är du säker att du vill ta bort befintlig tråd?\")") %>' CausesValidation="false" />
             <asp:LinkButton ID="LinkButton2" runat="server" CommandName="Edit" Text="Redigera" CausesValidation="false" />
         </ItemTemplate>

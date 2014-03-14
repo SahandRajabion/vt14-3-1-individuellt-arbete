@@ -170,82 +170,82 @@ namespace Individuella.Model.DAL
 
 
 
-        ////"Insert New Contact" Skapar ny kontakt i databasen.
-        //public void InsertTagtype(Tagtype tagtype)
-        //{
-        //    //Skapar och initierar ett anslutningsobjekt.
-        //    using (SqlConnection conn = CreateConnection())
-        //    {
-        //        try
-        //        {
-        //            //Exekverar den lagrade proceduren "Person.uspAddContact", som har samma anslutningsobjekt (conn).
-        //            SqlCommand cmd = new SqlCommand("appSchema.usp_InsertTagtype", conn);
-        //            //Sätter om typen till Stored procedure då den av standard är av typen "Text".
-        //            cmd.CommandType = CommandType.StoredProcedure;
+        //"Insert New Contact" Skapar ny kontakt i databasen.
+        public void InsertTagtype(int threadid, int tagid)
+        {
+            //Skapar och initierar ett anslutningsobjekt.
+            using (SqlConnection conn = CreateConnection())
+            {
+                try
+                {
+                    //Exekverar den lagrade proceduren "Person.uspAddContact", som har samma anslutningsobjekt (conn).
+                    SqlCommand cmd = new SqlCommand("appSchema.uspNewTagType", conn);
+                    //Sätter om typen till Stored procedure då den av standard är av typen "Text".
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-        //            //Lägger till de parametrar som behövs för tillägg av ny kontakt i proceduren, samt datatyper.
-        //            cmd.Parameters.Add("@TypeID", SqlDbType.int, 4).Value = tagtype.TypeID;
-        //            cmd.Parameters.Add("@ThreadID", SqlDbType.int, 4).Value = tagtype.ThreadID;
-        //            cmd.Parameters.Add("@TagID", SqlDbType.int, 4).Value = tagtype.TagID;
+                    //Lägger till de parametrar som behövs för tillägg av ny kontakt i proceduren, samt datatyper.
+                    //cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Value = tagtype.TypeID;
+                    cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = threadid;
+                    cmd.Parameters.Add("@TagID", SqlDbType.Int, 4).Value = tagid;
 
-        //            //Hämtar data från proceduren som har en parameter i sig av typen "Output" genom att skapa ett SqlParameter-Objekt
-        //            // av samma typ, genom egenskapen "Direction". Hämtar sedan den nya postens PK-värde efter att den lagrade proceduren
-        //            // exekverats, det nya värdet hamnar då i "@ContactId" för den nya skapade kontakten.  
-        //            cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Direction = ParameterDirection.Output;
+                    //Hämtar data från proceduren som har en parameter i sig av typen "Output" genom att skapa ett SqlParameter-Objekt
+                    // av samma typ, genom egenskapen "Direction". Hämtar sedan den nya postens PK-värde efter att den lagrade proceduren
+                    // exekverats, det nya värdet hamnar då i "@ContactId" för den nya skapade kontakten.  
+                    cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Direction = ParameterDirection.Output;
 
-        //            //Öppnar anslutning till databasen
-        //            conn.Open();
+                    //Öppnar anslutning till databasen
+                    conn.Open();
 
-        //            //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny post(INSERT-sats).
-        //            //Antalet påverkade poster retuneras.
-        //            cmd.ExecuteNonQuery();
+                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny post(INSERT-sats).
+                    //Antalet påverkade poster retuneras.
+                    cmd.ExecuteNonQuery();
 
-        //            //Hämtar primärnyckelns nya värde den fått för den nya posten och tilldelar Customer-objektet detta värde.
-        //            tagtype.TypeID = (int)cmd.Parameters["@TypeID"].Value;
-        //        }
+                    //Hämtar primärnyckelns nya värde den fått för den nya posten och tilldelar Customer-objektet detta värde.
+                    //tagtype.TypeID = (int)cmd.Parameters["@TypeID"].Value;
+                }
 
-        //        catch
-        //        {
-        //            throw new ApplicationException("Ett fel har uppstått i dataåtkomst lagret. Gick ej skapa taggtyp.");
-        //        }
+                catch
+                {
+                    throw new ApplicationException("Ett fel har uppstått i dataåtkomst lagret. Gick ej skapa taggtyp.");
+                }
 
-        //    }
-        //}
+            }
+        }
 
 
 
-        ////Uppdaterar befintlig kontakt.
-        //public void UpdateTagtype(Tagtype tagtype)
-        //{
-        //    //Skapar och initierar ett anslutningsobjekt.
-        //    using (SqlConnection conn = CreateConnection())
-        //    {
-        //        try
-        //        {
-        //            //Exekverar den lagrade proceduren "Person.uspUpdateContact", som har samma anslutningsobjekt (conn).
-        //            SqlCommand cmd = new SqlCommand("appSchema.sup_UpdateTagtpe", conn);
-        //            //Sätter om typen till Stored procedure då den av standard är av typen "Text".
-        //            cmd.CommandType = CommandType.StoredProcedure;
+        //Uppdaterar befintlig kontakt.
+        public void UpdateTagtype(Tagtype tagtype)
+        {
+            //Skapar och initierar ett anslutningsobjekt.
+            using (SqlConnection conn = CreateConnection())
+            {
+                try
+                {
+                    //Exekverar den lagrade proceduren "Person.uspUpdateContact", som har samma anslutningsobjekt (conn).
+                    SqlCommand cmd = new SqlCommand("appSchema.sup_UpdateTagtpe", conn);
+                    //Sätter om typen till Stored procedure då den av standard är av typen "Text".
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-        //            //Lägger till de parametrar som behövs för Uppdatering av ny kontakt i proceduren, samt datatyper.
-        //            cmd.Parameters.Add("@TypeID", SqlDbType.int, 4).Value = tagtype.TypeID;
-        //            cmd.Parameters.Add("@ThreadID", SqlDbType.int, 4).Value = tagtype.ThreadID;
-        //            cmd.Parameters.Add("@TagID", SqlDbType.int, 4).Value = tagtype.TagID;
+                    //Lägger till de parametrar som behövs för Uppdatering av ny kontakt i proceduren, samt datatyper.
+                    cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Value = tagtype.TypeID;
+                    cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = tagtype.ThreadID;
+                    cmd.Parameters.Add("@TagID", SqlDbType.Int, 4).Value = tagtype.TagID;
 
-        //            //Öppnar anslutning till databasen
-        //            conn.Open();
+                    //Öppnar anslutning till databasen
+                    conn.Open();
 
-        //            //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Uppdatera en ny post(UPDATE-sats).
-        //            //Antalet påverkade poster retuneras.
-        //            cmd.ExecuteNonQuery();
-        //        }
+                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Uppdatera en ny post(UPDATE-sats).
+                    //Antalet påverkade poster retuneras.
+                    cmd.ExecuteNonQuery();
+                }
 
-        //        catch
-        //        {
-        //            throw new ApplicationException("Ett fel har uppstått i dataåtkomst lagret, gick ej uppdatera taggtyp");
-        //        }
-        //    }
-        //}
+                catch
+                {
+                    throw new ApplicationException("Ett fel har uppstått i dataåtkomst lagret, gick ej uppdatera taggtyp");
+                }
+            }
+        }
 
 
 

@@ -128,7 +128,46 @@ namespace Individuella.Model.DAL
 
 
 
+        ////"Insert New Contact" Skapar ny kontakt i databasen.
+        //public void InsertTag(Tagg tag)
+        //{
+        //    //Skapar och initierar ett anslutningsobjekt.
+        //    using (SqlConnection conn = CreateConnection())
+        //    {
+        //        try
+        //        {
+        //            //Exekverar den lagrade proceduren "Person.uspAddContact", som har samma anslutningsobjekt (conn).
+        //            SqlCommand cmd = new SqlCommand("appSchema.usp_NewTag", conn);
+        //            //Sätter om typen till Stored procedure då den av standard är av typen "Text".
+        //            cmd.CommandType = CommandType.StoredProcedure;
 
+        //            //Lägger till de parametrar som behövs för tillägg av ny kontakt i proceduren, samt datatyper.
+        //            cmd.Parameters.Add("@Tag", SqlDbType.VarChar, 30).Value = tag.Tag;
+
+
+        //            //Hämtar data från proceduren som har en parameter i sig av typen "Output" genom att skapa ett SqlParameter-Objekt
+        //            // av samma typ, genom egenskapen "Direction". Hämtar sedan den nya postens PK-värde efter att den lagrade proceduren
+        //            // exekverats, det nya värdet hamnar då i "@ContactId" för den nya skapade kontakten.  
+        //            cmd.Parameters.Add("@TagID", SqlDbType.Int, 4).Direction = ParameterDirection.Output;
+
+        //            //Öppnar anslutning till databasen
+        //            conn.Open();
+
+        //            //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny post(INSERT-sats).
+        //            //Antalet påverkade poster retuneras.
+        //            cmd.ExecuteNonQuery();
+
+        //            //Hämtar primärnyckelns nya värde den fått för den nya posten och tilldelar Customer-objektet detta värde.
+        //            tag.TagID = (int)cmd.Parameters["@TagID"].Value;
+        //        }
+
+        //        catch
+        //        {
+        //            throw new ApplicationException("Ett fel har uppstått i dataåtkomst lagret. Gick ej spara ny tagg.");
+        //        }
+
+        //    }
+        //}
 
 
 

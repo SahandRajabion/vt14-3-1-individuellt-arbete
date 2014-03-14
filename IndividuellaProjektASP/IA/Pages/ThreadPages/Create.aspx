@@ -28,14 +28,6 @@
                 <asp:TextBox ID="Innehåll" runat="server" Height="200"  Text='<%# BindItem.Innehåll %>' TextMode="MultiLine" />
             </div>
             
-            <div>
-                <asp:LinkButton ID="LinkButton1" runat="server" Text="Spara" CommandName="Insert" />
-                <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl='<%$ RouteUrl:routename=Default %>'>Tillbaka</asp:HyperLink>
-               
-            </div>
-            
-
-
             <div class="edit2">
                 <label for="Tag">Välj Taggar:</label>
             </div>
@@ -43,7 +35,11 @@
             
              <asp:CheckBoxList ID="CheckBoxList1" SelectMethod="CheckBoxes_GetTags" TextAlign="Left" runat="server" OnDataBinding="CheckBoxList1_DataBinding" DataValueField="TagID" DataTextField="Tag"></asp:CheckBoxList>
 
-
+            <div>
+                <asp:LinkButton ID="LinkButton1" runat="server" Text="Spara" CommandName="Insert" />
+                <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl='<%$ RouteUrl:routename=Default %>'>Tillbaka</asp:HyperLink>
+               
+            </div>
 
 
         </InsertItemTemplate>

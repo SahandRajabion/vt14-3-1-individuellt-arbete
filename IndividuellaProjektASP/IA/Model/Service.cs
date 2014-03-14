@@ -127,10 +127,12 @@ namespace Individuella.Model
             if (thread.ThreadID == 0)
             {
                 ThreadDAL.InsertThread(thread);
+                
             }
             else
             {
                 ThreadDAL.UpdateThread(thread);
+               
             }
         }
 
@@ -156,22 +158,17 @@ namespace Individuella.Model
         }
 
 
-        //FUNKAR FORTFARANDE EJ
+     
 
-        ////Spara Tråd efter uppdatering eller Insert.
-        //public void InsertTagtype(Tagtype tagtype)
-        //{
-        //    // Tråd-objektet sparas antingen genom att en ny post eller
-        //    // skapas  genom att en befintlig tråd uppdateras.
-        //    if (tagtype.TypeID == 0)
-        //    {
-        //        TagtypeDAL.InsertTagtype(tagtype);
-        //    }
-        //    else
-        //    {
-        //        TagtypeDAL.UpdateTagtype(tagtype);
-        //    }
-        //}
+       public void InsertTagType(int threadId, int tagTypeId)
+     
+        {
+            TagtypeDAL.InsertTagtype(threadId, tagTypeId);
+        }
+
+
+
+
+        }
 
     }
-}
