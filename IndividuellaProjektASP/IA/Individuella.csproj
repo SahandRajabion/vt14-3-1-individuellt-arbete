@@ -128,7 +128,8 @@
     <Content Include="Account\Register.aspx" />
     <Content Include="Account\RegisterExternalLogin.aspx" />
     <Content Include="Contact.aspx" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Content\sttyle.css" />
+    <Content Include="Content\themes\base\images\close.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -197,11 +198,11 @@
     <Content Include="Images\orderedList8.png" />
     <Content Include="Images\orderedList9.png" />
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\Individuella.pubxml" />
     <None Include="Scripts\jquery-1.7.1.intellisense.js" />
+    <Content Include="Pages\Shared\Errorpage.aspx" />
     <Content Include="Pages\ThreadPages\Create.aspx" />
-    <Content Include="Pages\ThreadPages\Delete.aspx" />
     <Content Include="Pages\ThreadPages\Details.aspx" />
-    <Content Include="Pages\ThreadPages\Edit.aspx" />
     <Content Include="Pages\ThreadPages\Listing.aspx" />
     <Content Include="Scripts\jquery-1.7.1.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
@@ -309,6 +310,13 @@
     <Compile Include="Model\Tagg.cs" />
     <Compile Include="Model\Tagtype.cs" />
     <Compile Include="Model\Thread.cs" />
+    <Compile Include="Pages\Shared\Errorpage.aspx.cs">
+      <DependentUpon>Errorpage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\Shared\Errorpage.aspx.designer.cs">
+      <DependentUpon>Errorpage.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ThreadPages\Create.aspx.cs">
       <DependentUpon>Create.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -316,26 +324,12 @@
     <Compile Include="Pages\ThreadPages\Create.aspx.designer.cs">
       <DependentUpon>Create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Pages\ThreadPages\Delete.aspx.cs">
-      <DependentUpon>Delete.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Pages\ThreadPages\Delete.aspx.designer.cs">
-      <DependentUpon>Delete.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Pages\ThreadPages\Details.aspx.cs">
       <DependentUpon>Details.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Pages\ThreadPages\Details.aspx.designer.cs">
       <DependentUpon>Details.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ThreadPages\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Pages\ThreadPages\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
     </Compile>
     <Compile Include="Pages\ThreadPages\Listing.aspx.cs">
       <DependentUpon>Listing.aspx</DependentUpon>

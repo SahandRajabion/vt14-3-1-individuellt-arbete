@@ -4,7 +4,8 @@
     <h1>Trådar</h1>
 
      <asp:Panel runat="server" ID="Panel" Visible="false" CssClass="success">
-        <asp:Literal runat="server" ID="Literal" />
+     <asp:Literal runat="server" ID="Literal" />
+     <asp:ImageButton ID="CloseButton" runat="server" ImageUrl="~/Content/themes/base/images/close.png" CausesValidation="False" CssClass="closebutton" />
     </asp:Panel>
 
     <asp:ValidationSummary ID="ValidationSummary1" runat="server" CssClass="validation" />

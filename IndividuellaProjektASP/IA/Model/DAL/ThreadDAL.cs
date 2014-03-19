@@ -10,7 +10,7 @@ namespace Individuella.Model.DAL
     public class ThreadDAL:DALBase
     {
 
-        //Får en referens av ett list objekt i return med alla kontakter i databasen
+        //Får en referens av ett list objekt i return med alla Trådar i databasen
         public static IEnumerable<Thread> GetThreads()
         {
             //Skapar och initierar ett anslutningsobjekt genom basklassen.
@@ -20,10 +20,10 @@ namespace Individuella.Model.DAL
 
                 try
                 {
-                    //Skapar ett list-objekt som har plats för 100 referenser(hårdkodat) i Contact- objektet.
+                    //Skapar ett list-objekt som har plats för 100 referenser(hårdkodat) i Threads- objektet.
                     var Threads = new List<Thread>(100);
 
-                    //Exekverar den lagrade proceduren "Person.uspGetContacts", som har samma anslutningsobjekt (conn).
+                    //Exekverar den lagrade proceduren "appSchema.usp_GetThreads", som har samma anslutningsobjekt (conn).
                     var cmd = new SqlCommand("appSchema.usp_GetThreads", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -43,7 +43,7 @@ namespace Individuella.Model.DAL
                         while (reader.Read())
                         {
 
-                            //Refererar till klassen "Contact".
+                            //Refererar till klassen "Thread".
                             Threads.Add(new Thread
                             {
                                 //Tolkar posterna från databasen till C#, datatyper.
@@ -56,7 +56,7 @@ namespace Individuella.Model.DAL
                         }
 
                     }
-                    //Ser till att antal data som retunerats till list-objektet stämmer överens med den hårdkodade antal platserna "100" som vi angett. 
+                    //Ser till att antal data som retunerats till list-objektet stämmer överens med den hårdkodade antal platserna "10" som vi angett. 
                     Threads.TrimExcess();
                     return Threads;
                 }
@@ -73,7 +73,7 @@ namespace Individuella.Model.DAL
 
 
 
-        //Hämtar ut en kontakt i taget.
+        //Hämtar ut en Tråd i taget via ID.
         public Thread GetThreadById(int threadID)
         {
             //Skapar och initierar ett anslutningsobjekt.
@@ -81,15 +81,14 @@ namespace Individuella.Model.DAL
             {
                 try
                 {
-                    //Exekverar den lagrade proceduren "Person.uspGetContact", som har samma anslutningsobjekt (conn).
+                    //Exekverar den lagrade proceduren "appSchema.usp_GetThreadByID", som har samma anslutningsobjekt (conn).
                     SqlCommand cmd = new SqlCommand("appSchema.usp_GetThreadByID", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Lägger till en parameter till ett kommando via metoden ".Add" som den lagrade proceduren behöver, så man kan hämta en kontakt,
-                    //med specifikt ID.
+                    ///Skickar med parametrar den lagrade proceduren kräver. (Mindre jobb för ASP.NET än addWithValue).
                     cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = threadID;
-                    //cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Direction = ParameterDirection.Output;
+                    
 
                     //Öppnar en anslutning.
                     conn.Open();
@@ -108,7 +107,7 @@ namespace Individuella.Model.DAL
                             int innehållIndex = reader.GetOrdinal("Innehåll");
                             int datumIndex = reader.GetOrdinal("Datum");
 
-                            //Går igenom klassen "Contact" och retunerar datat en i taget.
+                            //Går igenom klassen "Thread" och retunerar datat en i taget.
                             return new Thread
                             {
                                 //Tolkar posterna från databasen till C#, datatyper.
@@ -135,7 +134,7 @@ namespace Individuella.Model.DAL
 
 
 
-        //"Insert New Contact" Skapar ny kontakt i databasen.
+        //Skapar ny Tråd i databasen.
         public void InsertThread(Thread thread)
         {
             //Skapar och initierar ett anslutningsobjekt.
@@ -143,29 +142,31 @@ namespace Individuella.Model.DAL
             {
                 try
                 {
-                    //Exekverar den lagrade proceduren "Person.uspAddContact", som har samma anslutningsobjekt (conn).
+                    //Exekverar den lagrade proceduren "appSchema.usp_NewThread", som har samma anslutningsobjekt (conn).
                     SqlCommand cmd = new SqlCommand("appSchema.usp_NewThread", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Lägger till de parametrar som behövs för tillägg av ny kontakt i proceduren, samt datatyper.
+                    //Lägger till de parametrar som behövs för tillägg av ny tråd i proceduren, samt datatyper.
                     cmd.Parameters.Add("@Titel", SqlDbType.VarChar, 30).Value = thread.Titel;
                     cmd.Parameters.Add("@Innehåll", SqlDbType.VarChar, 8000).Value = thread.Innehåll;
                    
                     //Hämtar data från proceduren som har en parameter i sig av typen "Output" genom att skapa ett SqlParameter-Objekt
                     // av samma typ, genom egenskapen "Direction". Hämtar sedan den nya postens PK-värde efter att den lagrade proceduren
                     // exekverats, det nya värdet hamnar då i "@ContactId" för den nya skapade kontakten.  
+                    // Hämtar det värdet som databasen tilldelat ThreadID.
                     cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Direction = ParameterDirection.Output;
 
                     //Öppnar anslutning till databasen
                     conn.Open();
 
-                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny post(INSERT-sats).
+                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny tråd(INSERT-sats).
                     //Antalet påverkade poster retuneras.
                     cmd.ExecuteNonQuery();
 
-                    //Hämtar primärnyckelns nya värde den fått för den nya posten och tilldelar Customer-objektet detta värde.
+                    //Hämtar primärnyckelns nya värde den fått för den nya posten och tilldelar thread-objektet detta värde.
                     thread.ThreadID = (int)cmd.Parameters["@ThreadID"].Value;
+                   
                 }
 
                 catch
@@ -179,7 +180,7 @@ namespace Individuella.Model.DAL
 
 
 
-        //Uppdaterar befintlig kontakt.
+        //Uppdaterar befintlig tråd.
         public void UpdateThread(Thread thread)
         {
             //Skapar och initierar ett anslutningsobjekt.
@@ -187,12 +188,12 @@ namespace Individuella.Model.DAL
             {
                 try
                 {
-                    //Exekverar den lagrade proceduren "Person.uspUpdateContact", som har samma anslutningsobjekt (conn).
+                    //Exekverar den lagrade proceduren "appSchema.usp_UpdateThread", som har samma anslutningsobjekt (conn).
                     SqlCommand cmd = new SqlCommand("appSchema.usp_UpdateThread", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Lägger till de parametrar som behövs för Uppdatering av ny kontakt i proceduren, samt datatyper.
+                    //Lägger till de parametrar som behövs för Uppdatering av ny tråd i proceduren, samt datatyper.
                     cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = thread.ThreadID;
                     cmd.Parameters.Add("@Titel", SqlDbType.VarChar, 30).Value = thread.Titel;
                     cmd.Parameters.Add("@Innehåll", SqlDbType.VarChar, 8000).Value = thread.Innehåll;
@@ -215,7 +216,7 @@ namespace Individuella.Model.DAL
 
 
 
-        //Radera en befintlig kontakt
+        //Radera en befintlig tråd.
         public void DeleteThread(int threadID)
         {
             //Skapar och initierar ett anslutningsobjekt.
@@ -223,18 +224,18 @@ namespace Individuella.Model.DAL
             {
                 try
                 {
-                    //Exekverar den lagrade proceduren "Person.uspRemoveContact", som har samma anslutningsobjekt (conn).
+                    //Exekverar den lagrade proceduren "appSchema.usp_DeleteThread", som har samma anslutningsobjekt (conn).
                     SqlCommand cmd = new SqlCommand("appSchema.usp_DeleteThread", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Skickar med parametrar för att ta bort en kontakt från databasen, så man kan ta bort kontakt med rätt ID från tabellen.
+                    //Skickar med parametrar för att ta bort en tråd från databasen, så man kan ta bort tråden med rätt ID från tabellen.
                     cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = threadID;
 
                     //Öppnar anslutning till databasen.
                     conn.Open();
 
-                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Radera en kontakt(DELETE-sats).
+                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Radera en tråd(DELETE-sats).
                     //Antalet påverkade poster retuneras.
                     cmd.ExecuteNonQuery();
 
@@ -246,12 +247,6 @@ namespace Individuella.Model.DAL
                 }
             }
         }
-
-
-
-
-
-
 
 
 

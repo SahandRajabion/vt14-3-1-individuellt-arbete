@@ -12,7 +12,7 @@ namespace Individuella.Model
 
         public int TagID { get; set; }
 
-        [Required(ErrorMessage = "Ett val måste anges.")]
+        [Required(ErrorMessage = "Minst ett val måste anges.")]
         public string Tag { get; set; }
 
 

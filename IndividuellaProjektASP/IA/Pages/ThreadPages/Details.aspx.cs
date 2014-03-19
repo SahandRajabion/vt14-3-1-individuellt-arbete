@@ -25,15 +25,14 @@ namespace Individuella.Pages.ThreadPages
         {
 
 
-
+            //Finns det något meddelande användaren bör se, hämtas det genom "Page.GetTempData" i PageExctencion klassen.
             Literal.Text = Page.GetTempData("Msg") as string;
-            Literal.Visible = !String.IsNullOrWhiteSpace(Literal.Text);
+            Panel.Visible = !String.IsNullOrWhiteSpace(Literal.Text);
 
 
         }
 
-
-
+        //Visar specifik tråd genom hämtat ID. Rätt tråd hämtat med "[RoutData]".
         public Thread ThreadListView_GetData([RouteData] int ID)
         {
             try
@@ -47,14 +46,14 @@ namespace Individuella.Pages.ThreadPages
             }
         }
 
-
+        //Tar bort en tråd med specifikt ID. Rätt tråd hämtat med "[RoutData]".
         public void ThreadListView_DeleteItem([RouteData] int ID)
         {
             try
             {
                 Service.DeleteThread(ID);
 
-                // Lägger till meddelande i Page extension-metoden
+                // Lägger till nytt meddelande i Page extension-metoden för användaren.
                 Page.SetTempData("Msg", "Tråden är borttagen.");
                 Response.RedirectToRoute("Default");
                 Context.ApplicationInstance.CompleteRequest();
@@ -65,13 +64,14 @@ namespace Individuella.Pages.ThreadPages
             }
         }
 
-
+        //Uppdaterar en tråd med specifikt ID. Rätt tråd hämtat med "[RoutData]".
         public void ThreadListView_UpdateItem([RouteData] int ID)
         {
             try
             {
                 var thread = Service.GetThreadByID(ID);
 
+                //Retuneras ett nullvärde när ID ska hämtas visas felmeddelande.
                 if (thread == null)
                 {
                     ModelState.AddModelError(String.Empty,
@@ -83,8 +83,9 @@ namespace Individuella.Pages.ThreadPages
                 {
                     Service.SaveThread(thread);
 
-                    // Lägger till ett meddelande i Page extension-metoden
+                    // Lägger till ett nytt meddelande i Page extension-metoden för användaren.
                     Page.SetTempData("Msg", "Tråden har uppdaterats.");
+                    //Skickar tillbaka användaren från redigeringsläge till Details, med hjälp av rätt tråd ID.
                     Response.RedirectToRoute("ThreadDetails", new { id = thread.ThreadID });
                     Context.ApplicationInstance.CompleteRequest();
                 }
@@ -97,41 +98,95 @@ namespace Individuella.Pages.ThreadPages
 
 
 
-        public IEnumerable<Tagg> CheckBoxListReadOnly_GetData()
+        //Hämtar Taggtype. Retunerar den information som hämtats.
+        public List<Tagtype> Listview_GetData([RouteData] int id)
         {
+            try
+            {
+                return Service.GetTagForThread(id);
+            }
 
-            Service service = new Service();
-            return service.GetTags();
+
+            catch (Exception)
+            {
+
+                ModelState.AddModelError(String.Empty, "Ett fel inträffade då Tagtype skulle hämtas.");
+                return null;
+            }
         }
 
-        protected void CheckBoxListReadOnly_DataBinding(object sender, EventArgs e)
+
+        //Hämtar Taggarna kopplade till tråden.
+        protected void Listview_ItemDataBound(object sender, ListViewItemEventArgs e)
         {
+            //Hittar kontroll
+            var label = e.Item.FindControl("TagLabel") as Label;
 
-            //FUNGERAR EJ 
+            //Om label inte är null går den in i IF-satsen... 
+            if (label != null)
+            {
 
-            //ArrayList TagCheckId = new ArrayList();
-          
-            //CheckBoxList checkboxlist = (CheckBoxList)ThreadListView.FindControl("CheckBoxListReadOnly");
-            //foreach (ListItem fields in checkboxlist.Items)
-            //{
-            //    if (fields.Selected)
-            //    {
+                //... och typ omvandlar datat så vi kan använda oss utav nyckeln ...
+                var type = (Tagtype)e.Item.DataItem;
 
-            //        TagCheckId.Add((string)fields.Value);
-                   
-            //    }
-            //}
+                //... därefter(efter att taggarna hämtats) loopar vi igenom och matchar valda taggar(Id:n med retunerad data). 
+                var tags = Service.GetTags().Single(ct => ct.TagID == type.TagID);
 
-
-            
-
-
-
-
+                //Skriver ut de taggar som valts.
+                label.Text = String.Format(label.Text, tags.Tag);
+            }
 
 
 
 
         }
+
+
+
+
+
+        // Hämtar RouteData id från tidigare hämtad data, och lägger in den i egenskapen för vidare användning av "id".
+        protected int Id
+        {
+            get { return int.Parse(RouteData.Values["id"].ToString()); }
+        }
+
+
+        //Tar bort Tagtype.
+        public void TaggListView_DeleteItem(Tagtype tagtype)
+        {
+            try
+            {
+                // Hämtar först Tagtype.
+                Service service = new Service();
+                var tagtypes = service.GetTagForThread(Id);
+
+                // Kontrollerar om minst 1 tagg finns kvar =(minst en  tagtype rad i tabellen).
+                if (tagtypes.Count > 1)
+                {
+                    
+                    //Skickas här vidare till service klassen för bortagning av rätt rad i Tagtype tabellen =(rätt tagg för användaren).
+                    service.DeleteTagtype(tagtype.TypeID);
+
+                    // Lägger till meddelande i Page extension-metoden för användaren.
+                    Page.SetTempData("Msg", "Taggen är borttagen.");
+                    Response.RedirectToRoute("ThreadDetails");
+                    Context.ApplicationInstance.CompleteRequest();
+                }
+
+                else
+                {
+                    ModelState.AddModelError(String.Empty, "Går ej ta bort, tråden måste minst ha en tagg.");
+                }
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(String.Empty, "Ett fel har inträffat när taggen skulle tas bort.");
+            }
+        }
+
     }
+
 }
+
+

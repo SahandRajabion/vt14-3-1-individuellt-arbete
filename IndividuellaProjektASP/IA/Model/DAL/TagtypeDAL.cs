@@ -9,124 +9,79 @@ namespace Individuella.Model.DAL
 {
     public class TagtypeDAL:DALBase
     {
-
-        //Får en referens av ett list objekt i return med alla kontakter i databasen
-        public static IEnumerable<Tagtype> GetTagtypes()
+        
+        public List<Tagtype> GetTagForThread(int threadId)
         {
-            //Skapar och initierar ett anslutningsobjekt genom basklassen.
-            //Använder Using (ist. för conn.Close) för att stänga ner objektet per automatik efter användning.
+            // Skapar ett anslutningsobjekt.
             using (var conn = CreateConnection())
             {
-
                 try
                 {
-                    //Skapar ett list-objekt som har plats för 100 referenser(hårdkodat) i Contact- objektet.
-                    var tagtypes = new List<Tagtype>(100);
-
-                    //Exekverar den lagrade proceduren "Person.uspGetContacts", som har samma anslutningsobjekt (conn).
-                    var cmd = new SqlCommand("appSchema.usp_GetTagtype", conn);
-                    //Sätter om typen till Stored procedure då den av standard är av typen "Text".
+                    
+                    
+                    // Skapar och initierar ett SqlCommand-objekt som används till att exekveras lagrad procedur. (Hämtar TypeID från Tagtypetabell)
+                    var cmd = new SqlCommand("appSchema.usp_GetTagTypeForThreads", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Öppnar upp en anslutning till databasen.
+
+                    //Skickar med parametrar den lagrade proceduren kräver. (Mindre jobb för ASP.NET än addWithValue).
+                    cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = threadId;
+                    
+
+                    // Skapar det List-objekt som initialt har plats för 10 referenser till objekt.
+                    var tags = new List<Tagtype>(10);
+
+                    // Öppnar anslutningen till databasen.
                     conn.Open();
 
-                    //Exekverar SELECT-frågan i den lagrade proceduren och retunerar en Datareader-Objekt som gör att vi kan få ut rätt index nedan.
+                    // Den lagrade proceduren innehåller en SELECT-sats som kan returnera flera poster varför
+                    // ett SqlDataReader-objekt måste ta hand om alla poster. 
+
+                    //Exekverar SELECT-frågan i den lagrade proceduren och retunerar en Datareader-Objekt som gör att vi kan få ut rätt index nedan.(Ett SqlDataReader-objekt tar hand om alla poster).
+                    //Metoden ExecuteReader skapar ett SqlDataReader-objekt och returnerar en referens till objektet.
+                    
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
+                        
+
                         //Via "GetOrdinal", får vi tillbaka rätt index som tillhör det angivna fältet. (Bättre än hårdkodat index).
                         var typeIdIndex = reader.GetOrdinal("TypeID");
-                        var ThreadIdIndex = reader.GetOrdinal("ThreadID");
-                        var TagIdIndex = reader.GetOrdinal("TagID");
-                       
+                        var threadIdIndex = reader.GetOrdinal("ThreadID");
+                        var tagIdIndex = reader.GetOrdinal("TagID");             
+                        
+                        
 
+                        
                         //Loopar igenom det retunerade SqlDataReader-objektet tills det ej finns poster kvar att läsa.(While Statement Returns True).
                         while (reader.Read())
                         {
-
-                            //Refererar till klassen "Contact".
-                            tagtypes.Add(new Tagtype
+                             //Refererar till klassen "Tagg".
+                            tags.Add(new Tagtype
                             {
                                 //Tolkar posterna från databasen till C#, datatyper.
                                 TypeID = reader.GetInt32(typeIdIndex),
-                                ThreadID = reader.GetInt32(ThreadIdIndex),
-                                TagID = reader.GetInt32(TagIdIndex),
-                               
+                                ThreadID = reader.GetInt32(threadIdIndex),
+                                TagID = reader.GetInt32(tagIdIndex)
+                                
+
+
 
                             });
-
                         }
-
+                       
                     }
-                    //Ser till att antal data som retunerats till list-objektet stämmer överens med den hårdkodade antal platserna "100" som vi angett. 
-                    tagtypes.TrimExcess();
-                    return tagtypes;
+
+                    //Ser till att antal data som retunerats till list-objektet stämmer överens med den hårdkodade antal platserna "10" som vi angett eller till X-antal data som retuneras(ej mer än 10). 
+                    //Avallokerar oanvänt minne.
+                    tags.TrimExcess();
+
+                    // Returnerar referensen till List-objektet med referenser med Contact-objekt.
+                    return tags;
                 }
-
-                catch (Exception)
-                {
-                    throw new ApplicationException("Fel uppstod när tagg typerna skulle hämtas från databasen.");
-                }
-            }
-
-        }
-
-
-
-
-
-
-
-        //Hämtar ut en kontakt i taget.
-        public Tagtype GetTagtypeByID(int typeId)
-        {
-            //Skapar och initierar ett anslutningsobjekt.
-            using (SqlConnection conn = CreateConnection())
-            {
-                try
-                {
-                    //Exekverar den lagrade proceduren "Person.uspGetContact", som har samma anslutningsobjekt (conn).
-                    SqlCommand cmd = new SqlCommand("appSchema.usp_GetTagtypesByID", conn);
-                    //Sätter om typen till Stored procedure då den av standard är av typen "Text".
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    //Lägger till en parameter till ett kommando via metoden ".Add" som den lagrade proceduren behöver, så man kan hämta en kontakt,
-                    //med specifikt ID.
-                    cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Value = typeId;
-
-                    //Öppnar en anslutning.
-                    conn.Open();
-
-
-                    //Exekverar SELECT-frågan i den lagrade proceduren och retunerar en Datareader-Objekt
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        //Loopar igenom det retunerade SqlDataReader-objektet tills det ej finns poster kvar att läsa.
-                        if (reader.Read())
-                        {
-                            var typeIdIndex = reader.GetOrdinal("TypeID");
-                            var ThreadIdIndex = reader.GetOrdinal("ThreadID");
-                            var TagIdIndex = reader.GetOrdinal("TagID");
-
-                            //Går igenom klassen "Contact" och retunerar datat en i taget.
-                            return new Tagtype
-                            {
-                                //Tolkar posterna från databasen till C#, datatyper.
-                                TypeID = reader.GetInt32(typeIdIndex),
-                                ThreadID = reader.GetInt32(ThreadIdIndex),
-                                TagID = reader.GetInt32(TagIdIndex),
-                               
-
-                            };
-                        }
-                    }
-                    //Retunerar null ifall det ej finns ngn data att hämta.
-                    return null;
-                }
-
                 catch
                 {
-                    throw new ApplicationException("Fel har uppstått i dataåtkomstlagret.");
+                    
+                    throw new ApplicationException("Fel! Det gick inte att hämta tag via tagtype id");
                 }
             }
         }
@@ -134,26 +89,31 @@ namespace Individuella.Model.DAL
 
 
 
-        //Radera en befintlig kontakt
+
+
+
+        //Radera en befintlig TagtypeID genom att vi hämtat ut info(ThreadID) i annan metod och matchat med rätt "rad" i tagtype tabellen.
         public void DeleteTagtype(int TypeId)
         {
-            //Skapar och initierar ett anslutningsobjekt.
+            //Skapar och initierar ett anslutningsobjekt genom basklassen (DALBase).
+            //Använder Using (ist. för conn.Close) för att stänga ner objektet per automatik efter användning.
             using (SqlConnection conn = CreateConnection())
             {
                 try
                 {
-                    //Exekverar den lagrade proceduren "Person.uspRemoveContact", som har samma anslutningsobjekt (conn).
-                    SqlCommand cmd = new SqlCommand("appSchema.usp_DeleteTagtype", conn);
+                    //Exekverar den lagrade proceduren "appSchema.usp_DeleteTagType", som har samma anslutningsobjekt (conn).
+                    SqlCommand cmd = new SqlCommand("appSchema.usp_DeleteTagType", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Skickar med parametrar för att ta bort en kontakt från databasen, så man kan ta bort kontakt med rätt ID från tabellen.
+                    //Lägger till en parameter till ett kommando via metoden ".Add" som den lagrade proceduren kräver för att exekveras, så man kan radera en tagtyp 
+                    //med specifikt ID.
                     cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Value = TypeId;
 
                     //Öppnar anslutning till databasen.
                     conn.Open();
 
-                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Radera en kontakt(DELETE-sats).
+                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Radera en TypeID (DELETE-sats).
                     //Antalet påverkade poster retuneras.
                     cmd.ExecuteNonQuery();
 
@@ -170,7 +130,7 @@ namespace Individuella.Model.DAL
 
 
 
-        //"Insert New Contact" Skapar ny kontakt i databasen.
+        // Skapar ny Tagtyperad i databasen.
         public void InsertTagtype(int threadid, int tagid)
         {
             //Skapar och initierar ett anslutningsobjekt.
@@ -178,30 +138,30 @@ namespace Individuella.Model.DAL
             {
                 try
                 {
-                    //Exekverar den lagrade proceduren "Person.uspAddContact", som har samma anslutningsobjekt (conn).
+                    //Exekverar den lagrade proceduren "appSchema.uspNewTagType", som har samma anslutningsobjekt (conn).
                     SqlCommand cmd = new SqlCommand("appSchema.uspNewTagType", conn);
                     //Sätter om typen till Stored procedure då den av standard är av typen "Text".
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //Lägger till de parametrar som behövs för tillägg av ny kontakt i proceduren, samt datatyper.
-                    //cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Value = tagtype.TypeID;
+                    //Lägger till de parametrar som behövs för tillägg av ny Tagtype i proceduren, samt datatyper.
+                  
                     cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = threadid;
                     cmd.Parameters.Add("@TagID", SqlDbType.Int, 4).Value = tagid;
 
                     //Hämtar data från proceduren som har en parameter i sig av typen "Output" genom att skapa ett SqlParameter-Objekt
                     // av samma typ, genom egenskapen "Direction". Hämtar sedan den nya postens PK-värde efter att den lagrade proceduren
-                    // exekverats, det nya värdet hamnar då i "@ContactId" för den nya skapade kontakten.  
+                    // exekverats, det nya värdet hamnar då i "@TypeID" för den nya skapade tagtypen.
+                    // Hämtar det värdet som databasen tilldelat ThreadID.
                     cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Direction = ParameterDirection.Output;
 
                     //Öppnar anslutning till databasen
                     conn.Open();
 
-                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny post(INSERT-sats).
+                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att lägga till en ny tagtype(INSERT-sats).
                     //Antalet påverkade poster retuneras.
                     cmd.ExecuteNonQuery();
 
-                    //Hämtar primärnyckelns nya värde den fått för den nya posten och tilldelar Customer-objektet detta värde.
-                    //tagtype.TypeID = (int)cmd.Parameters["@TypeID"].Value;
+                    
                 }
 
                 catch
@@ -211,47 +171,6 @@ namespace Individuella.Model.DAL
 
             }
         }
-
-
-
-        //Uppdaterar befintlig kontakt.
-        public void UpdateTagtype(Tagtype tagtype)
-        {
-            //Skapar och initierar ett anslutningsobjekt.
-            using (SqlConnection conn = CreateConnection())
-            {
-                try
-                {
-                    //Exekverar den lagrade proceduren "Person.uspUpdateContact", som har samma anslutningsobjekt (conn).
-                    SqlCommand cmd = new SqlCommand("appSchema.sup_UpdateTagtpe", conn);
-                    //Sätter om typen till Stored procedure då den av standard är av typen "Text".
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    //Lägger till de parametrar som behövs för Uppdatering av ny kontakt i proceduren, samt datatyper.
-                    cmd.Parameters.Add("@TypeID", SqlDbType.Int, 4).Value = tagtype.TypeID;
-                    cmd.Parameters.Add("@ThreadID", SqlDbType.Int, 4).Value = tagtype.ThreadID;
-                    cmd.Parameters.Add("@TagID", SqlDbType.Int, 4).Value = tagtype.TagID;
-
-                    //Öppnar anslutning till databasen
-                    conn.Open();
-
-                    //Exekverar den del av den lagrade proceduren (ej SELECT) som används till att Uppdatera en ny post(UPDATE-sats).
-                    //Antalet påverkade poster retuneras.
-                    cmd.ExecuteNonQuery();
-                }
-
-                catch
-                {
-                    throw new ApplicationException("Ett fel har uppstått i dataåtkomst lagret, gick ej uppdatera taggtyp");
-                }
-            }
-        }
-
-
-
-
-
-
         
     }
 }

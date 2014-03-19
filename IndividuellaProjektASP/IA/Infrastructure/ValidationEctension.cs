@@ -8,7 +8,7 @@ namespace Individuella
 {
     public static class ValidationEctension
     {
-
+        //Validering av affärslogiklagret, ser till att en instans av ett objekt skickas, annars felmeddelande (Modelstate). 
         public static bool Validate<T>(this T instance, out ICollection<ValidationResult> validationResults)
         {
             var validationContext = new ValidationContext(instance);

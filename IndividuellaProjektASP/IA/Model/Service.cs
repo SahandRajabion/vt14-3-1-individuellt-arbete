@@ -57,24 +57,23 @@ namespace Individuella.Model
 
 
         // Hämtar alla Taggar som finns tillgängliga i databasen.
-
         public IEnumerable<Tagg> GetTags(bool refresh = false)
         {
-            // Försöker hämta lista med Taggar från cachen.
+            // Försöker hämta lista med Taggar från cache minnet.
             var Tags = HttpContext.Current.Cache["Tagg"] as IEnumerable<Tagg>;
 
-            // Om det inte finns det en lista med taggar...
+            // Om det inte finns en befintlig lista med taggar redan cashat i minnet så...
             if (Tags == null || refresh)
             {
-                // ...hämtar då lista med Taggar från databasen...
+                // ...hämtar den  en lista med Taggar från databasen igen...
                 Tags = TagDAL.GetTags();
 
-                // ...och cachar dessa. List-objektet, inklusive alla tagg-objek, kommer att cachas 
-                // under 10 minuter, varefter de automatiskt avallokeras från webbserverns primärminne.
+                // ...och cachar dessa. List-objektet med alla tagg-objekt, kommer att cachas 
+                // under 10 minuters tid, därefter kommer de att automatiskt avallokeras från webbserverns primärminne.
                 HttpContext.Current.Cache.Insert("Tagg", Tags, null, DateTime.Now.AddMinutes(10), TimeSpan.Zero);
             }
 
-            // Returnerar listan med taggar.
+            // Returnerar listan med taggarna.
             return Tags;
         }
 
@@ -93,37 +92,31 @@ namespace Individuella.Model
             return ThreadDAL.GetThreadById(threadID);
         }
 
-        // Hämtar trådar med ett specifikt id från databasen.
-        public Tagg GetTagByID(int tagID)
-        {
-            return TagDAL.GetTTagById(tagID);
-        }
-
-
-
-        // Tar bort tråd från databasen.
+        // Tar bort tråd från databasen med specifikt ID.
         public void DeleteThread(int threadID)
         {
             ThreadDAL.DeleteThread(threadID);
         }
 
 
+      
+
         //Spara Tråd efter uppdatering eller Insert.
         public void SaveThread(Thread thread)
         {
 
-            // Validering på affärslogiklagret
+            // Validering på affärslogiklagret sker först. Om valideringen går igenom ...
             ICollection<ValidationResult> validationResults;
             if (!thread.Validate(out validationResults))
             {
-                // kastas ett undantag med ett allmänt felmeddelande samt en referens till samlingen med resultat av valideringen
+                // ... kastas ett undantag med ett allmänt felmeddelande samt en referens till samlingen med resultat av valideringen
                 var ex = new ValidationException("Objektet klarade inte av valideringen.");
                 ex.Data.Add("ValidationResults", validationResults);
                 throw ex;
             }
 
-            // Tråd-objektet sparas antingen genom att en ny post eller
-            // skapas  genom att en befintlig tråd uppdateras. Ny Tråd skapas om ID: et = 0.
+            // Tråd-objektet sparas antingen genom att en ny post skapats eller 
+            // genom att en befintlig tråd uppdateras. Ny Tråd skapas om ID: et = 0 ( alltså ej har fått ngt ID än).
             if (thread.ThreadID == 0)
             {
                 ThreadDAL.InsertThread(thread);
@@ -138,36 +131,27 @@ namespace Individuella.Model
 
 
 
-        // Hämtar alla trådar som finns tillgängliga i databasen.
-        public IEnumerable<Tagtype> GetTagtypes()
-        {
-            return TagtypeDAL.GetTagtypes();
-        }
+      
 
-        // Hämtar trådar med ett specifikt id från databasen.
-        public Tagtype GetTagtypeByID(int typeId)
+        //Sparar en ny tagtype genom att skicka med behövande parametrar till metoden för Insert i tagtypeDAL.
+        public void InsertTagType(int threadId, int tagTypeId)
         {
-            return TagtypeDAL.GetTagtypeByID(typeId);
+            TagtypeDAL.InsertTagtype(threadId, tagTypeId);
         }
 
 
-        // Tar bort tråd från databasen.
+        // Tar bort tagtype från databasen.
         public void DeleteTagtype(int TypeId)
         {
             TagtypeDAL.DeleteTagtype(TypeId);
         }
 
 
-     
-
-       public void InsertTagType(int threadId, int tagTypeId)
-     
+        //Hämtar ut information(data,typeID) från relationsobjektet i databasen via skicka med ThreadID som matchas mot befintlig typerad(ID) i tabellen.  
+        public List<Tagtype> GetTagForThread(int threadId)
         {
-            TagtypeDAL.InsertTagtype(threadId, tagTypeId);
+            return TagtypeDAL.GetTagForThread(threadId);
         }
-
-
-
 
         }
 

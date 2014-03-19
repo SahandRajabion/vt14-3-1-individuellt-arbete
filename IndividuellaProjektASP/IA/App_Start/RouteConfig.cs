@@ -12,10 +12,9 @@ namespace Individuella.App_Start
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.MapPageRoute("InsertThread", "SkapaTråd", "~/Pages/ThreadPages/Create.aspx");
-            routes.MapPageRoute("DeleteThread", "SkapaTråd", "~/Pages/ThreadPages/Delete.aspx");
-            routes.MapPageRoute("EditThread", "SkapaTråd", "~/Pages/ThreadPages/Edit.aspx");
             routes.MapPageRoute("ThreadDetails", "thread/{id}", "~/Pages/ThreadPages/Details.aspx");
-            routes.MapPageRoute("Default", "", "~/Pages/ThreadPages/Listing.aspx");
+            routes.MapPageRoute("Default", "Listing", "~/Pages/ThreadPages/Listing.aspx");
+            routes.MapPageRoute("Error", "Serverfel", "~/Pages/Shared/Errorpage.aspx");
         }
 
 

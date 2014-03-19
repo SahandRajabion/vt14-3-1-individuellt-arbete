@@ -12,11 +12,12 @@ namespace Individuella.Pages.ThreadPages
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-              // Om det finns något meddelande i extension-metoden så hämtas det ut här.
+              // Om det finns något meddelande från annan sida, i Pageextension-metoden så hämtas det ut och visas för användaren.
             Literal.Text = Page.GetTempData("Msg") as string;
             Panel.Visible = !String.IsNullOrWhiteSpace(Literal.Text);
         }
 
+             //Hämtar ut alla trådar i en lista för användaren (Bokstavs ordning).
              public IEnumerable<Thread> ThreadListView_GetData()
        
              {

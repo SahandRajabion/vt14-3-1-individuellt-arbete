@@ -23,33 +23,49 @@ namespace Individuella.Pages.ThreadPages
                  {
                      try
                      {
-
-                    ArrayList TagCheckId = new ArrayList();
-                    CheckBoxList checkboxlist = (CheckBoxList)ThreadFormView.FindControl("CheckBoxList1");
-                    foreach (ListItem fields in checkboxlist.Items)
-                    {
-                        if (fields.Selected)
-                        {
-                            TagCheckId.Add(int.Parse(fields.Value));
-                        }
-                    }
-
-
-                         Service service = new Service();
-                         service.SaveThread(thread);
-
-                         for (int i = 0; i < TagCheckId.Count; i++)
+                         // Skapar en array-list objekt där vi kommer retunera alla olika alternativ i checkboxen
+                         ArrayList TagCheckId = new ArrayList();
+                         //Läser in "checkboxlist1" kontrollen.
+                         CheckBoxList checkboxlist = (CheckBoxList)ThreadFormView.FindControl("CheckBoxList1");
+                        
+                         //För varje ikryssat alternativ, läggs alternativet in i arayen.
+                         foreach (ListItem fields in checkboxlist.Items)
                          {
-
-                             service.InsertTagType(thread.ThreadID, (int)TagCheckId[i]);
-                         
+                             if (fields.Selected)
+                             {
+                                 //Typomvandlar alternativet till en Int innan den läggs till.
+                                 TagCheckId.Add(int.Parse(fields.Value));
+                             }
                          }
 
+                         // Sert till att minst ett alternativ är ikryssat.
+                         if (TagCheckId.Count == 0)
+                         {
 
-                         Page.SetTempData("Msg", "Tråden har lagts till.");
-                         Response.RedirectToRoute("Default");
-                         Context.ApplicationInstance.CompleteRequest();
+                             ModelState.AddModelError(string.Empty, "Minst en Tagg måste väljas.");
+                         }
 
+                         else
+                         {  
+                             
+                             Service service = new Service();
+                             service.SaveThread(thread);
+
+                             //Loopar igeom och kollar om flera taggar har valts.
+                             for (int i = 0; i < TagCheckId.Count; i++)
+                             {
+                                 //Skapar nya rader i relationsobjektet(Minst en ny rad) genom att skicka in...
+                                 //... ThreadID samt arrayen bestående av Tag IDn.
+                                 service.InsertTagType(thread.ThreadID, (int)TagCheckId[i]);
+
+                             }
+
+                             //Sätter nytt meddelande i "PAgeExtencion metoden"-
+                             Page.SetTempData("Msg", "Tråden har lagts till.");
+                             Response.RedirectToRoute("Default");
+                             Context.ApplicationInstance.CompleteRequest();
+
+                         }
                      }
 
                      catch (Exception)
@@ -58,10 +74,12 @@ namespace Individuella.Pages.ThreadPages
                      }
                  }
              }
-
+             
+             // Retunerar alla olika alternativ (Checkboxes) i en lista, så vi får dem synliga för användaren. 
              public IEnumerable<Tagg> CheckBoxes_GetTags()
              {
                
+                 //Skapar ett service objekt och anropar ".GetTags" i serviceklassen.
                  Service service = new Service();
                  return service.GetTags();
              }
